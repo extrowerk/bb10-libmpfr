@@ -1,8 +1,8 @@
 /* mpfr_cmp_si_2exp -- compare a floating-point number with a signed
 machine integer multiplied by a power of 2
 
-Copyright 1999, 2001-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999, 2001-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -43,7 +43,7 @@ mpfr_cmp_si_2exp (mpfr_srcptr b, long int i, mpfr_exp_t f)
       else if (MPFR_IS_ZERO(b))
         return i != 0 ? -si : 0;
       /* NAN */
-      MPFR_SET_ERANGEFLAG ();
+      MPFR_SET_ERANGE ();
       return 0;
     }
   else if (MPFR_SIGN(b) != si || i == 0)

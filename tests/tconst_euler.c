@@ -1,7 +1,7 @@
 /* Test file for mpfr_const_euler.
 
-Copyright 2001-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2001-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -19,6 +19,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "mpfr-test.h"
 
@@ -74,14 +77,11 @@ main (int argc, char *argv[])
       mpfr_set_prec (t, prec);
       yprec = prec + 10;
 
-      RND_LOOP_NO_RNDF (rnd)
+      for (rnd = 0; rnd < MPFR_RND_MAX; rnd++)
         {
           mpfr_set_prec (y, yprec);
           mpfr_const_euler (y, (mpfr_rnd_t) rnd);
           err = (rnd == MPFR_RNDN) ? yprec + 1 : yprec;
-          /* Note: for rnd = RNDF, rnd1 = RNDF is equivalent to rnd1 = RNDN
-             in mpfr_can_round, thus rnd2 = RNDF reduces to rnd2 = RNDN in that
-             case, we are duplicating the test for rnd = RNDN. */
           if (mpfr_can_round (y, err, (mpfr_rnd_t) rnd, (mpfr_rnd_t) rnd, prec))
             {
               mpfr_set (t, y, (mpfr_rnd_t) rnd);
@@ -97,7 +97,8 @@ main (int argc, char *argv[])
                   mpfr_out_str (stdout, 2, prec, t, MPFR_RNDN);
                   puts ("");
                   printf ("   approximation was ");
-                  mpfr_dump (y);
+                  mpfr_print_binary (y);
+                  puts ("");
                   exit (1);
                 }
             }
@@ -108,7 +109,7 @@ main (int argc, char *argv[])
   mpfr_clear (z);
   mpfr_clear (t);
 
-  test_generic (MPFR_PREC_MIN, 200, 1);
+  test_generic (2, 200, 1);
 
   tests_end_mpfr ();
   return 0;

@@ -1,7 +1,7 @@
 /* Test file for mpfr_get_d
 
-Copyright 1999-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -20,6 +20,8 @@ along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <float.h>
 
 #include "mpfr-test.h"
@@ -89,7 +91,7 @@ static void
 check_inf_nan (void)
 {
   /* only if nans and infs are available */
-#if !defined(MPFR_ERRDIVZERO)
+#if _GMP_IEEE_FLOATS && !defined(MPFR_ERRDIVZERO)
   mpfr_t  x;
   double  d;
 
@@ -97,17 +99,17 @@ check_inf_nan (void)
 
   mpfr_set_inf (x, 1);
   d = mpfr_get_d (x, MPFR_RNDZ);
-  MPFR_ASSERTN (d > 0);
-  MPFR_ASSERTN (DOUBLE_ISINF (d));
+  ASSERT_ALWAYS (d > 0);
+  ASSERT_ALWAYS (DOUBLE_ISINF (d));
 
   mpfr_set_inf (x, -1);
   d = mpfr_get_d (x, MPFR_RNDZ);
-  MPFR_ASSERTN (d < 0);
-  MPFR_ASSERTN (DOUBLE_ISINF (d));
+  ASSERT_ALWAYS (d < 0);
+  ASSERT_ALWAYS (DOUBLE_ISINF (d));
 
   mpfr_set_nan (x);
   d = mpfr_get_d (x, MPFR_RNDZ);
-  MPFR_ASSERTN (DOUBLE_ISNAN (d));
+  ASSERT_ALWAYS (DOUBLE_ISNAN (d));
 
   mpfr_clear (x);
 #endif
@@ -139,7 +141,7 @@ check_max (void)
   MPFR_ASSERTN(d == -DBL_MAX);
   d = mpfr_get_d (u, MPFR_RNDU);
   MPFR_ASSERTN(d == -DBL_MAX);
-#if !defined(MPFR_ERRDIVZERO)
+#if _GMP_IEEE_FLOATS && !defined(MPFR_ERRDIVZERO)
   d = mpfr_get_d (u, MPFR_RNDN);
   MPFR_ASSERTN(DOUBLE_ISINF(d) && d < 0.0);
   d = mpfr_get_d (u, MPFR_RNDD);
@@ -151,7 +153,7 @@ check_max (void)
   MPFR_ASSERTN(d == DBL_MAX);
   d = mpfr_get_d (u, MPFR_RNDD);
   MPFR_ASSERTN(d == DBL_MAX);
-#if !defined(MPFR_ERRDIVZERO)
+#if _GMP_IEEE_FLOATS && !defined(MPFR_ERRDIVZERO)
   d = mpfr_get_d (u, MPFR_RNDN);
   MPFR_ASSERTN(DOUBLE_ISINF(d) && d > 0.0);
   d = mpfr_get_d (u, MPFR_RNDU);

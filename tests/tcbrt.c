@@ -1,7 +1,7 @@
 /* Test file for mpfr_cbrt.
 
-Copyright 2002-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2002-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -19,6 +19,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "mpfr-test.h"
 
@@ -60,14 +63,14 @@ special (void)
   /* cbrt(+/-0) =  +/-0 */
   mpfr_set_ui (x, 0, MPFR_RNDN);
   mpfr_cbrt (y, x, MPFR_RNDN);
-  if (MPFR_NOTZERO (y) || MPFR_IS_NEG (y))
+  if (mpfr_cmp_ui (y, 0) || mpfr_sgn (y) < 0)
     {
       printf ("Error: cbrt(+0) <> +0\n");
       exit (1);
     }
   mpfr_neg (x, x, MPFR_RNDN);
   mpfr_cbrt (y, x, MPFR_RNDN);
-  if (MPFR_NOTZERO (y) || MPFR_IS_POS (y))
+  if (mpfr_cmp_ui (y, 0) || mpfr_sgn (y) > 0)
     {
       printf ("Error: cbrt(-0) <> -0\n");
       exit (1);
@@ -207,7 +210,7 @@ main (void)
     }
   mpfr_clear (x);
 
-  test_generic (MPFR_PREC_MIN, 200, 10);
+  test_generic (2, 200, 10);
 
   data_check ("data/cbrt", mpfr_cbrt, "mpfr_cbrt");
 

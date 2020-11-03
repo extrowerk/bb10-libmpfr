@@ -1,7 +1,7 @@
 /* mpfr_sgn -- Sign of a floating point number.
 
-Copyright 2003-2004, 2006-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2003-2004, 2006-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -31,7 +31,7 @@ int
         return 0;
       if (MPFR_UNLIKELY (MPFR_IS_NAN (a)))
         {
-          MPFR_SET_ERANGEFLAG ();
+          MPFR_SET_ERANGE ();
           return 0;
         }
       /* Remains infinity, handled by the return below. */

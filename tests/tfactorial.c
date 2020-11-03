@@ -1,7 +1,7 @@
 /* Test file for mpfr_factorial.
 
-Copyright 2001-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2001-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -19,6 +19,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "mpfr-test.h"
 
@@ -90,8 +93,6 @@ test_int (void)
           mpfr_set_prec (y, p);
           for (r = 0; r < MPFR_RND_MAX; r++)
             {
-              if ((mpfr_rnd_t) r == MPFR_RNDF)
-                continue;
               inex1 = mpfr_fac_ui (x, n, (mpfr_rnd_t) r);
               inex2 = mpfr_set_z (y, f, (mpfr_rnd_t) r);
               if (mpfr_cmp (x, y))
@@ -105,7 +106,6 @@ test_int (void)
                 {
                   printf ("Wrong inexact flag for n=%lu prec=%lu rnd=%s\n",
                           n, (unsigned long) p, mpfr_print_rnd_mode ((mpfr_rnd_t) r));
-                  printf ("Expected %d, got %d\n", inex2, inex1);
                   exit (1);
                 }
             }
@@ -155,14 +155,13 @@ overflowed_fac0 (void)
           if (! mpfr_equal_p (x, y))
             {
               printf ("Error in overflowed_fac0 (rnd = %s):\n"
-                      "  Got        ",
-                      mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
-              mpfr_dump (x);
-              printf ("  instead of 0.11111111E0.\n");
+                      "  Got ", mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
+              mpfr_print_binary (x);
+              printf (" instead of 0.11111111E0.\n");
               err = 1;
             }
         }
-      else if (rnd != MPFR_RNDF)
+      else
         {
           if (inex <= 0)
             {
@@ -171,13 +170,12 @@ overflowed_fac0 (void)
                       mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
               err = 1;
             }
-          if (! (mpfr_inf_p (x) && MPFR_IS_POS (x)))
+          if (! (mpfr_inf_p (x) && MPFR_SIGN (x) > 0))
             {
               printf ("Error in overflowed_fac0 (rnd = %s):\n"
-                      "  Got        ",
-                      mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
-              mpfr_dump (x);
-              printf ("  instead of +Inf.\n");
+                      "  Got ", mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
+              mpfr_print_binary (x);
+              printf (" instead of +Inf.\n");
               err = 1;
             }
         }
@@ -193,12 +191,10 @@ overflowed_fac0 (void)
 int
 main (int argc, char *argv[])
 {
-  unsigned int err, k, zeros;
-  unsigned long n;
+  unsigned int prec, err, yprec, n, k, zeros;
   int rnd;
   mpfr_t x, y, z, t;
   int inexact;
-  unsigned long prec, yprec;
 
   tests_start_mpfr ();
 
@@ -219,7 +215,7 @@ main (int argc, char *argv[])
       exit (1);
     }
 
-  for (prec = MPFR_PREC_MIN; prec <= 100; prec++)
+  for (prec = 2; prec <= 100; prec++)
     {
       mpfr_set_prec (x, prec);
       mpfr_set_prec (z, prec);
@@ -230,8 +226,6 @@ main (int argc, char *argv[])
       for (n = 0; n < 50; n++)
         for (rnd = 0; rnd < MPFR_RND_MAX; rnd++)
           {
-            if ((mpfr_rnd_t) rnd == MPFR_RNDF)
-              continue;
             inexact = mpfr_fac_ui (y, n, (mpfr_rnd_t) rnd);
             err = (rnd == MPFR_RNDN) ? yprec + 1 : yprec;
             if (mpfr_can_round (y, err, (mpfr_rnd_t) rnd, (mpfr_rnd_t) rnd, prec))
@@ -247,9 +241,6 @@ main (int argc, char *argv[])
                     if (inexact)
                       {
                         printf ("Wrong inexact flag: expected exact\n");
-                        printf ("n=%lu prec=%lu rnd=%s\n", n, prec,
-                                mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
-                        mpfr_dump (z);
                         exit (1);
                       }
                   }
@@ -258,9 +249,8 @@ main (int argc, char *argv[])
                     if (!inexact)
                       {
                         printf ("Wrong inexact flag: expected inexact\n");
-                        printf ("n=%lu prec=%lu rnd=%s\n", n, prec,
-                                mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
-                        mpfr_dump (z);
+                        printf ("n=%u prec=%u\n", n, prec);
+                        mpfr_print_binary(z); puts ("");
                         exit (1);
                       }
                   }
@@ -268,14 +258,17 @@ main (int argc, char *argv[])
                   {
                     printf ("results differ for x=");
                     mpfr_out_str (stdout, 2, prec, x, MPFR_RNDN);
-                    printf (" prec=%lu rnd_mode=%s\n", prec,
+                    printf (" prec=%u rnd_mode=%s\n", prec,
                             mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
-                    printf ("   got               ");
-                    mpfr_dump (z);
-                    printf ("   expected          ");
-                    mpfr_dump (t);
+                    printf ("   got ");
+                    mpfr_out_str (stdout, 2, prec, z, MPFR_RNDN);
+                    puts ("");
+                    printf ("   expected ");
+                    mpfr_out_str (stdout, 2, prec, t, MPFR_RNDN);
+                    puts ("");
                     printf ("   approximation was ");
-                    mpfr_dump (y);
+                    mpfr_print_binary (y);
+                    puts ("");
                     exit (1);
                   }
               }

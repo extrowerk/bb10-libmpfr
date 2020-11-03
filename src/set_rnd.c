@@ -1,8 +1,8 @@
 /* mpfr_set_default_rounding_mode -- set the default rounding mode
    mpfr_get_default_rounding_mode -- get the default rounding mode
 
-Copyright 1999, 2001, 2004-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999, 2001, 2004-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -23,7 +23,7 @@ http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 
 #include "mpfr-impl.h"
 
-MPFR_THREAD_VAR (mpfr_rnd_t, __gmpfr_default_rounding_mode, MPFR_RNDN)
+mpfr_rnd_t MPFR_THREAD_ATTR __gmpfr_default_rounding_mode = MPFR_RNDN;
 
 void
 mpfr_set_default_rounding_mode (mpfr_rnd_t rnd_mode)

@@ -1,7 +1,7 @@
 /* Test file for mpfr_set_q.
 
-Copyright 2000-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2000-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -20,9 +20,10 @@ along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
 
-#include "mpfr-test.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-#ifndef MPFR_USE_MINI_GMP
+#include "mpfr-test.h"
 
 static void
 check (long int n, long int d, mpfr_rnd_t rnd, const char *ys)
@@ -30,7 +31,7 @@ check (long int n, long int d, mpfr_rnd_t rnd, const char *ys)
   mpq_t q;
   mpfr_t x, t;
   int inexact, compare;
-  mpfr_flags_t flags, ex_flags;
+  unsigned int flags, ex_flags;
 
   mpfr_init2 (x, 53);
   mpfr_init2 (t, mpfr_get_prec (x) + mp_bits_per_limb);
@@ -130,11 +131,11 @@ check_nan_inf_mpq (void)
       mpfr_init2 (mpfr_cmp, MPFR_PREC_MIN);
       mpfr_set_nan (mpfr_cmp);
       printf ("mpfr_set_q with a NAN mpq value returned a wrong value :\n"
-              "  expected ");
-      mpfr_dump (mpfr_cmp);
-      printf ("  got      ");
-      mpfr_dump (mpfr_value);
-      printf ("  ternary value is %d\n", status);
+              " waiting for ");
+      mpfr_print_binary (mpfr_cmp);
+      printf (" got ");
+      mpfr_print_binary (mpfr_value);
+      printf ("\n trinary value is %d\n", status);
       exit (1);
     }
 
@@ -149,11 +150,11 @@ check_nan_inf_mpq (void)
       mpfr_init2 (mpfr_cmp, MPFR_PREC_MIN);
       mpfr_set_inf (mpfr_cmp, -1);
       printf ("mpfr_set_q with a -INF mpq value returned a wrong value :\n"
-              "  expected ");
-      mpfr_dump (mpfr_cmp);
-      printf ("  got      ");
-      mpfr_dump (mpfr_value);
-      printf ("  ternary value is %d\n", status);
+              " waiting for ");
+      mpfr_print_binary (mpfr_cmp);
+      printf (" got ");
+      mpfr_print_binary (mpfr_value);
+      printf ("\n trinary value is %d\n", status);
       exit (1);
     }
 
@@ -183,13 +184,3 @@ main (void)
   tests_end_mpfr ();
   return 0;
 }
-
-#else
-
-int
-main (void)
-{
-  return 77;
-}
-
-#endif

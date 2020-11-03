@@ -1,7 +1,7 @@
 /* mpfr_sinh_cosh -- hyperbolic sine and cosine
 
-Copyright 2001-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2001-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -95,7 +95,7 @@ mpfr_sinh_cosh (mpfr_ptr sh, mpfr_ptr ch, mpfr_srcptr xt, mpfr_rnd_t rnd_mode)
     /* the optimal number of bits : see algorithms.ps */
     N = N + MPFR_INT_CEIL_LOG2 (N) + 4;
 
-    /* initialize of intermediary variables */
+    /* initialise of intermediary variables */
     MPFR_GROUP_INIT_3 (group, N, s, c, ti);
 
     /* First computation of sinh_cosh */
@@ -143,7 +143,7 @@ mpfr_sinh_cosh (mpfr_ptr sh, mpfr_ptr ch, mpfr_srcptr xt, mpfr_rnd_t rnd_mode)
                 break;
               }
           }
-        /* actualization of the precision */
+        /* actualisation of the precision */
         N += err;
         MPFR_ZIV_NEXT (loop, N);
         MPFR_GROUP_REPREC_3 (group, N, s, c, ti);

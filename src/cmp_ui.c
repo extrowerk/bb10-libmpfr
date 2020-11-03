@@ -1,8 +1,8 @@
 /* mpfr_cmp_ui_2exp -- compare a floating-point number with an unsigned
 machine integer multiplied by a power of 2
 
-Copyright 1999, 2001-2004, 2006-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999, 2001-2004, 2006-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -37,7 +37,7 @@ mpfr_cmp_ui_2exp (mpfr_srcptr b, unsigned long int i, mpfr_exp_t f)
     {
       if (MPFR_IS_NAN (b))
         {
-          MPFR_SET_ERANGEFLAG ();
+          MPFR_SET_ERANGE ();
           return 0;
         }
       else if (MPFR_IS_INF(b))

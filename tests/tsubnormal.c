@@ -1,7 +1,7 @@
 /* Test file for mpfr_subnormalize.
 
-Copyright 2005-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2005-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -19,6 +19,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 
 #include "mpfr-test.h"
 
@@ -63,7 +67,7 @@ check1 (void)
   mpfr_set_emax (10);
 
   mpfr_init (x);
-  for (i = 0; i < numberof (tab); i++)
+  for (i = 0; i < (sizeof (tab) / sizeof (tab[0])); i++)
     for (s = 0; s <= (tab[i].rnd == MPFR_RNDN); s++)
       for (k = 0; k <= 1; k++)
         {

@@ -1,7 +1,7 @@
 /* Test file for mpfr_ui_div.
 
-Copyright 2000-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2000-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -19,6 +19,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "mpfr-test.h"
 
@@ -55,7 +58,7 @@ check_inexact (void)
   mpfr_init (y);
   mpfr_init (z);
 
-  for (px = MPFR_PREC_MIN; px < 300; px++)
+  for (px = 2; px < 300; px++)
     {
       mpfr_set_prec (x, px);
       do
@@ -64,7 +67,7 @@ check_inexact (void)
         }
       while (mpfr_cmp_ui (x, 0) == 0);
       u = randlimb ();
-      for (py = MPFR_PREC_MIN; py < 300; py++)
+      for (py = 2; py < 300; py++)
         {
           mpfr_set_prec (y, py);
           mpfr_set_prec (z, py + px);
@@ -77,7 +80,7 @@ check_inexact (void)
                   exit (1);
                 }
               cmp = mpfr_cmp_ui (z, u);
-              if (rnd != MPFR_RNDF && ! SAME_SIGN (inexact, cmp))
+              if (! SAME_SIGN (inexact, cmp))
                 {
                   printf ("Wrong inexact flag for u=%lu, rnd=%s\n",
                           u, mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
@@ -104,12 +107,13 @@ check_special (void)
   mpfr_init2 (d, 100L);
   mpfr_init2 (q, 100L);
 
-  /* 1/+inf == +0 */
+  /* 1/+inf == 0 */
   MPFR_SET_INF (d);
   MPFR_SET_POS (d);
   mpfr_clear_flags ();
   MPFR_ASSERTN (mpfr_ui_div (q, 1L, d, MPFR_RNDZ) == 0); /* exact */
-  MPFR_ASSERTN (MPFR_IS_ZERO (q) && MPFR_IS_POS (q));
+  MPFR_ASSERTN (mpfr_number_p (q));
+  MPFR_ASSERTN (mpfr_sgn (q) == 0);
   MPFR_ASSERTN (__gmpfr_flags == 0);
 
   /* 1/-inf == -0 */
@@ -117,7 +121,8 @@ check_special (void)
   MPFR_SET_NEG (d);
   mpfr_clear_flags ();
   MPFR_ASSERTN (mpfr_ui_div (q, 1L, d, MPFR_RNDZ) == 0); /* exact */
-  MPFR_ASSERTN (MPFR_IS_ZERO (q) && MPFR_IS_NEG (q));
+  MPFR_ASSERTN (mpfr_number_p (q));
+  MPFR_ASSERTN (mpfr_sgn (q) == 0);
   MPFR_ASSERTN (__gmpfr_flags == 0);
 
   /* 1/nan == nan */
@@ -153,14 +158,14 @@ check_special (void)
   mpfr_set_ui (d, 1L, MPFR_RNDN);
   mpfr_clear_flags ();
   MPFR_ASSERTN (mpfr_ui_div (q, 0L, d, MPFR_RNDZ) == 0); /* exact */
-  MPFR_ASSERTN (MPFR_IS_ZERO (q) && MPFR_IS_POS (q));
+  MPFR_ASSERTN (mpfr_cmp_ui (q, 0) == 0 && MPFR_IS_POS (q));
   MPFR_ASSERTN (__gmpfr_flags == 0);
 
   /* 0/-1 = -0 */
   mpfr_set_si (d, -1, MPFR_RNDN);
   mpfr_clear_flags ();
   MPFR_ASSERTN (mpfr_ui_div (q, 0L, d, MPFR_RNDZ) == 0); /* exact */
-  MPFR_ASSERTN (MPFR_IS_ZERO (q) && MPFR_IS_NEG (q));
+  MPFR_ASSERTN (mpfr_cmp_ui (q, 0) == 0 && MPFR_IS_NEG (q));
   MPFR_ASSERTN (__gmpfr_flags == 0);
 
   mpfr_clear (d);
@@ -179,7 +184,7 @@ check_overflow (void)
   mpfr_exp_t emin, emax;
   mpfr_t x, y1, y2;
   int inex1, inex2, rnd_mode;
-  mpfr_flags_t flags1, flags2;
+  unsigned int flags1, flags2;
 
   emin = mpfr_get_emin ();
   emax = mpfr_get_emax ();
@@ -242,7 +247,7 @@ main (int argc, char *argv[])
         "-6.8938315017943889615e-297");
   check_overflow ();
 
-  test_generic (MPFR_PREC_MIN, 1000, 100);
+  test_generic (2, 1000, 100);
 
   /* inv is for 1/x */
   data_check ("data/inv", mpfr_inv, "mpfr_ui_div(1,x)");

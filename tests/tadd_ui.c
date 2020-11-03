@@ -1,7 +1,7 @@
 /* Test file for mpfr_add_ui
 
-Copyright 2000-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2000-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -20,6 +20,8 @@ along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <float.h>
 
 #include "mpfr-test.h"
@@ -67,9 +69,7 @@ check_nans (void)
 
   /* nan + 2394875 == nan */
   mpfr_set_nan (x);
-  mpfr_clear_nanflag ();
   mpfr_add_ui (y, x, 2394875L, MPFR_RNDN);
-  MPFR_ASSERTN (mpfr_nanflag_p ());
   MPFR_ASSERTN (mpfr_nan_p (y));
 
   /* +inf + 2394875 == +inf */
@@ -110,7 +110,7 @@ main (int argc, char *argv[])
   check3 ("-2.0769715792901673e-5", 880524, MPFR_RNDN,
           "8.8052399997923023e5");
 
-  test_generic (MPFR_PREC_MIN, 1000, 100);
+  test_generic (2, 1000, 100);
 
   tests_end_mpfr ();
   return 0;

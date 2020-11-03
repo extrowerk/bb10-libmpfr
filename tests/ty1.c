@@ -1,7 +1,7 @@
 /* ty1 -- test file for the Bessel function of second kind (order 1)
 
-Copyright 2007-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2007-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -20,11 +20,13 @@ along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "mpfr-test.h"
 
 #define TEST_FUNCTION mpfr_y1
 #define RAND_FUNCTION(x) mpfr_random2(x, MPFR_LIMB_SIZE (x), 8, RANDS)
-#define REDUCE_EMAX 262143 /* otherwise arg. reduction is too expensive */
 #include "tgeneric.c"
 
 int
@@ -86,7 +88,7 @@ main (int argc, char *argv[])
   mpfr_clear (x);
   mpfr_clear (y);
 
-  test_generic (MPFR_PREC_MIN, 100, 1);
+  test_generic (2, 100, 1);
 
   data_check ("data/y1", mpfr_y1, "mpfr_y1");
 

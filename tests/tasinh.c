@@ -1,7 +1,7 @@
 /* Test file for mpfr_asinh.
 
-Copyright 2001-2004, 2006-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2001-2004, 2006-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -19,6 +19,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "mpfr-test.h"
 
@@ -53,14 +56,14 @@ special (void)
   /* asinh(+0) = +0, asinh(-0) = -0 */
   mpfr_set_ui (x, 0, MPFR_RNDN);
   mpfr_asinh (y, x, MPFR_RNDN);
-  if (MPFR_NOTZERO (y) || MPFR_IS_NEG (y))
+  if (mpfr_cmp_ui (y, 0) || mpfr_sgn (y) < 0)
     {
       printf ("Error: mpfr_asinh(+0) <> +0\n");
       exit (1);
     }
   mpfr_neg (x, x, MPFR_RNDN);
   mpfr_asinh (y, x, MPFR_RNDN);
-  if (MPFR_NOTZERO (y) || MPFR_IS_POS (y))
+  if (mpfr_cmp_ui (y, 0) || mpfr_sgn (y) > 0)
     {
       printf ("Error: mpfr_asinh(-0) <> -0\n");
       exit (1);
@@ -147,7 +150,7 @@ main (int argc, char *argv[])
 
   special ();
 
-  test_generic (MPFR_PREC_MIN, 100, 25);
+  test_generic (2, 100, 25);
 
   data_check ("data/asinh", mpfr_asinh, "mpfr_asinh");
   bad_cases (mpfr_asinh, mpfr_sinh, "mpfr_asinh", 256, -128, 29,

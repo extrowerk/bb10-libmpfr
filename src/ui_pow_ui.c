@@ -1,7 +1,7 @@
-/*  mpfr_ui_pow_ui -- compute the power between two machine integers
+/*  mpfr_ui_pow_ui -- compute the power beetween two machine integer
 
-Copyright 1999-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 

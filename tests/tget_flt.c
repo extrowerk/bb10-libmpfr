@@ -1,7 +1,7 @@
 /* Test file for mpfr_get_flt and mpfr_set_flt
 
-Copyright 2009-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2009-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -20,8 +20,8 @@ along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
 
+#include <stdlib.h>
 #include <float.h>     /* for FLT_MIN */
-
 #include "mpfr-test.h"
 
 int
@@ -54,10 +54,9 @@ main (void)
 #if !defined(MPFR_ERRDIVZERO)
   mpfr_set_nan (x);
   f = mpfr_get_flt (x, MPFR_RNDN);
-  if (! DOUBLE_ISNAN (f))
+  if (f == f)
     {
       printf ("Error for mpfr_get_flt(NaN)\n");
-      printf ("got f=%f\n", f);
       exit (1);
     }
   mpfr_set_flt (x, f, MPFR_RNDN);
@@ -93,7 +92,7 @@ main (void)
   mpfr_set_ui (x, 0, MPFR_RNDN);
   f = mpfr_get_flt (x, MPFR_RNDN);
   mpfr_set_flt (x, f, MPFR_RNDN);
-  if (mpfr_zero_p (x) == 0 || MPFR_IS_NEG (x))
+  if (mpfr_zero_p (x) == 0 || MPFR_SIGN (x) < 0)
     {
       printf ("Error for mpfr_set_flt(mpfr_get_flt(+0))\n");
       exit (1);
@@ -104,7 +103,7 @@ main (void)
   mpfr_neg (x, x, MPFR_RNDN);
   f = mpfr_get_flt (x, MPFR_RNDN);
   mpfr_set_flt (x, f, MPFR_RNDN);
-  if (mpfr_zero_p (x) == 0 || MPFR_IS_POS (x))
+  if (mpfr_zero_p (x) == 0 || MPFR_SIGN (x) > 0)
     {
       printf ("Error for mpfr_set_flt(mpfr_get_flt(-0))\n");
       exit (1);
@@ -186,7 +185,6 @@ main (void)
       mpfr_mul_2exp (x, x, 1, MPFR_RNDN);
     }
 
-#ifdef HAVE_DENORMS_FLT
   mpfr_set_si_2exp (x, 1, -150, MPFR_RNDN);
   g = 0.0;
   f = mpfr_get_flt (x, MPFR_RNDN);
@@ -302,7 +300,6 @@ main (void)
       printf ("expected %.8e, got %.8e\n", g, f);
       exit (1);
     }
-#endif /* HAVE_DENORMS_FLT */
 
   mpfr_set_si_2exp (x, 1, 128, MPFR_RNDN);
   g = FLT_MAX;

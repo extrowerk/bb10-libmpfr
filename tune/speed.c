@@ -1,7 +1,7 @@
 /* Tune various threshold of MPFR
 
-Copyright 2005-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2005-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -31,7 +31,8 @@ http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 static short mulhigh_ktab[MPFR_MULHIGH_TAB_SIZE];
 #else
 static short mulhigh_ktab[] = {MPFR_MULHIGH_TAB};
-#define MPFR_MULHIGH_TAB_SIZE ((mp_size_t) (numberof (mulhigh_ktab)))
+#define MPFR_MULHIGH_TAB_SIZE \
+  ((mp_size_t) (sizeof(mulhigh_ktab) / sizeof(mulhigh_ktab[0])))
 #endif
 
 #undef _PROTO

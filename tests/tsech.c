@@ -1,7 +1,7 @@
 /* Test file for mpfr_sech.
 
-Copyright 2005-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2005-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -19,6 +19,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "mpfr-test.h"
 
@@ -45,7 +48,7 @@ check_specials (void)
 
   mpfr_set_inf (x, 1);
   mpfr_sech (y, x, MPFR_RNDN);
-  if (! (MPFR_IS_ZERO (y) && MPFR_IS_POS (y)))
+  if (! (MPFR_IS_ZERO (y) && MPFR_SIGN (y) > 0))
     {
       printf ("Error: sech(+Inf) != +0\n");
       exit (1);
@@ -53,7 +56,7 @@ check_specials (void)
 
   mpfr_set_inf (x, -1);
   mpfr_sech (y, x, MPFR_RNDN);
-  if (! (MPFR_IS_ZERO (y) && MPFR_IS_POS (y)))
+  if (! (MPFR_IS_ZERO (y) && MPFR_SIGN (y) > 0))
     {
       printf ("Error: sech(-Inf) != +0\n");
       exit (1);
@@ -78,14 +81,14 @@ check_specials (void)
   /* check huge x */
   mpfr_set_str (x, "8e8", 10, MPFR_RNDN);
   mpfr_sech (y, x, MPFR_RNDN);
-  if (! (mpfr_zero_p (y) && MPFR_IS_POS (y)))
+  if (! (mpfr_zero_p (y) && MPFR_SIGN (y) > 0))
     {
       printf ("Error: sech(8e8) != +0\n");
       exit (1);
     }
   mpfr_set_str (x, "-8e8", 10, MPFR_RNDN);
   mpfr_sech (y, x, MPFR_RNDN);
-  if (! (mpfr_zero_p (y) && MPFR_IS_POS (y)))
+  if (! (mpfr_zero_p (y) && MPFR_SIGN (y) > 0))
     {
       printf ("Error: sech(-8e8) != +0\n");
       exit (1);
@@ -114,7 +117,7 @@ overflowed_sech0 (void)
       set_emax (emax);  /* 1 is not representable. */
       /* and if emax < 0, 1 - eps is not representable either. */
       for (i = -1; i <= 1; i++)
-        RND_LOOP_NO_RNDF (rnd)
+        RND_LOOP (rnd)
           {
             mpfr_set_si_2exp (x, i, -512 * ABS (i), MPFR_RNDN);
             mpfr_clear_flags ();
@@ -139,10 +142,9 @@ overflowed_sech0 (void)
                 if (! mpfr_equal_p (x, y))
                   {
                     printf ("Error in overflowed_sech0 (i = %d, rnd = %s):\n"
-                            "  Got        ", i,
-                            mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
-                    mpfr_dump (x);
-                    printf ("  instead of 0.11111111E%d.\n", emax);
+                            "  Got ", i, mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
+                    mpfr_print_binary (x);
+                    printf (" instead of 0.11111111E%d.\n", emax);
                     err = 1;
                   }
               }
@@ -155,13 +157,12 @@ overflowed_sech0 (void)
                             i, mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
                     err = 1;
                   }
-                if (! (mpfr_inf_p (x) && MPFR_IS_POS (x)))
+                if (! (mpfr_inf_p (x) && MPFR_SIGN (x) > 0))
                   {
                     printf ("Error in overflowed_sech0 (i = %d, rnd = %s):\n"
-                            "  Got        ", i,
-                            mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
-                    mpfr_dump (x);
-                    printf ("  instead of +Inf.\n");
+                            "  Got ", i, mpfr_print_rnd_mode ((mpfr_rnd_t) rnd));
+                    mpfr_print_binary (x);
+                    printf (" instead of +Inf.\n");
                     err = 1;
                   }
               }
@@ -181,7 +182,7 @@ main (int argc, char *argv[])
   tests_start_mpfr ();
 
   check_specials ();
-  test_generic (MPFR_PREC_MIN, 200, 10);
+  test_generic (2, 200, 10);
   overflowed_sech0 ();
 
   tests_end_mpfr ();

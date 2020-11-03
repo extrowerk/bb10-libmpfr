@@ -1,7 +1,7 @@
 /* Test file for mpfr_set_d and mpfr_get_d.
 
-Copyright 1999-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -20,6 +20,8 @@ along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <float.h>
 
 #include "mpfr-test.h"
@@ -99,8 +101,6 @@ main (int argc, char *argv[])
   if (mpfr_cmp_ui (x, 0) != 0 || MPFR_IS_POS(x))
     {
       printf ("Error in mpfr_set_d on -0\n");
-      printf ("d = %g, x = ", d);
-      mpfr_dump (x);
       exit (1);
     }
 #endif  /* HAVE_SIGNEDZ */
@@ -123,7 +123,7 @@ main (int argc, char *argv[])
 
   /* checks that subnormals are not flushed to zero */
   d = DBL_MIN; /* 2^(-1022) */
-  for (n = 0; n < 53; n++, d /= 2.0)
+  for (n=0; n<52; n++, d /= 2.0)
     if (d != 0.0) /* should be 2^(-1022-n) */
       {
         mpfr_set_d (x, d, MPFR_RNDN);
@@ -133,7 +133,8 @@ main (int argc, char *argv[])
             printf ("got ");
             mpfr_out_str (stdout, 10, 10, x, MPFR_RNDN);
             printf ("\n");
-            mpfr_dump (x);
+            mpfr_print_binary (x);
+            puts ("");
             exit (1);
           }
       }
@@ -144,14 +145,14 @@ main (int argc, char *argv[])
    if (mpfr_cmp_ui (x, 4))
      {
        printf ("Error in tset_d: expected 4.0, got ");
-       mpfr_dump (x);
+       mpfr_print_binary (x); putchar('\n');
        exit (1);
      }
    mpfr_set_d (x, -5.0, MPFR_RNDN);
    if (mpfr_cmp_si (x, -4))
      {
        printf ("Error in tset_d: expected -4.0, got ");
-       mpfr_dump (x);
+       mpfr_print_binary (x); putchar('\n');
        exit (1);
      }
 
@@ -159,7 +160,7 @@ main (int argc, char *argv[])
    if (mpfr_cmp_ui (x, 1))
      {
        printf ("Error in tset_d: expected 1.0, got ");
-       mpfr_dump (x);
+       mpfr_print_binary (x); putchar('\n');
        exit (1);
      }
 
@@ -167,7 +168,7 @@ main (int argc, char *argv[])
   mpfr_set_d (z, 1.0, (mpfr_rnd_t) 0);
   if (mpfr_cmp_ui (z, 1))
     {
-      mpfr_dump (z);
+      mpfr_print_binary (z); puts ("");
       printf ("Error: 1.0 != 1.0\n");
       exit (1);
     }
@@ -176,7 +177,7 @@ main (int argc, char *argv[])
   mpfr_set_d (x, d=-1.08007920352320089721e+150, (mpfr_rnd_t) 0);
   if (mpfr_get_d1 (x) != d)
     {
-      mpfr_dump (x);
+      mpfr_print_binary (x); puts ("");
       printf ("Error: get_d o set_d <> identity for d = %1.20e %1.20e\n",
               d, mpfr_get_d1 (x));
       exit (1);
@@ -187,7 +188,8 @@ main (int argc, char *argv[])
   mpfr_set_d (x, d, (mpfr_rnd_t) 0);
   if (d != mpfr_get_d1 (x))
     {
-      mpfr_dump (x);
+      mpfr_print_binary (x);
+      puts ("");
       printf ("Error: get_d o set_d <> identity for d = %1.20e %1.20e\n",
               d, mpfr_get_d1 (x));
       exit (1);
@@ -210,7 +212,8 @@ main (int argc, char *argv[])
       if (d != dd && !(Isnan(d) && Isnan(dd)))
         {
           printf ("Mismatch on : %1.18g != %1.18g\n", d, mpfr_get_d1 (x));
-          mpfr_dump (x);
+          mpfr_print_binary (x);
+          puts ("");
           exit (1);
         }
     }

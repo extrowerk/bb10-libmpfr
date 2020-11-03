@@ -1,7 +1,7 @@
 /* mpfr_signbit -- Signbit of a MPFR number
 
-Copyright 2007-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2007-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -26,5 +26,5 @@ http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 int
 mpfr_signbit (mpfr_srcptr x)
 {
-  return MPFR_IS_NEG (x);
+  return MPFR_SIGN (x) < 0;
 }

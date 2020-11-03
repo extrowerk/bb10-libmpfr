@@ -1,8 +1,8 @@
 /* mpfr_gmp -- Limited gmp-impl emulator
    Modified version of the GMP files.
 
-Copyright 2004-2018 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2004-2015 Free Software Foundation, Inc.
+Contributed by the AriC and Caramel projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -21,9 +21,14 @@ along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 http://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
 
+#include <stdlib.h> /* For malloc, free, realloc and abort */
+
 #include "mpfr-impl.h"
 
 #ifndef MPFR_HAVE_GMP_IMPL
+
+char             mpfr_rands_initialized = 0;
+gmp_randstate_t  mpfr_rands;
 
 const struct bases mpfr_bases[257] =
 {
@@ -286,9 +291,9 @@ const struct bases mpfr_bases[257] =
   /* 256 */ {0.1250000000000000},
 };
 
-MPFR_COLD_FUNCTION_ATTR void
+void
 mpfr_assert_fail (const char *filename, int linenum,
-                  const char *expr)
+                     const char *expr)
 {
   if (filename != NULL && filename[0] != '\0')
     {
@@ -300,41 +305,54 @@ mpfr_assert_fail (const char *filename, int linenum,
   abort();
 }
 
-/* Performing a concentration for theses indirect functions may be
-   good for performance since branch prediction for indirect calls
-   is not well supported by a lot of CPU's (typically they can only
-   predict a limited number of indirections). */
-MPFR_HOT_FUNCTION_ATTR void *
-mpfr_allocate_func (size_t alloc_size)
+#ifdef mp_get_memory_functions
+
+/* putting 0 as initial values forces those symbols to be fully defined,
+   and always resolved, otherwise they are only tentatively defined, which
+   leads to problems on e.g. MacOS, cf
+   http://lists.gforge.inria.fr/pipermail/mpc-discuss/2008-November/000048.html
+   and http://software.intel.com/en-us/articles/intelr-fortran-compiler-for-mac-os-non_lazy_ptr-unresolved-references-from-linking
+   Note that using ranlib -c or libtool -c is another fix.
+*/
+MPFR_THREAD_ATTR void * (*mpfr_allocate_func) (size_t) = 0;
+MPFR_THREAD_ATTR void * (*mpfr_reallocate_func) (void *, size_t, size_t) = 0;
+MPFR_THREAD_ATTR void   (*mpfr_free_func) (void *, size_t) = 0;
+
+#endif
+
+void *
+mpfr_default_allocate (size_t size)
 {
-  void * (*allocate_func) (size_t);
-  void * (*reallocate_func) (void *, size_t, size_t);
-  void   (*free_func) (void *, size_t);
-  /* Always calling with the 3 arguments smooths branch prediction. */
-  mp_get_memory_functions (&allocate_func, &reallocate_func, &free_func);
-  return (*allocate_func) (alloc_size);
+  void *ret;
+  ret = malloc (size);
+  if (ret == NULL)
+    {
+      fprintf (stderr, "MPFR: Can't allocate memory (size=%lu)\n",
+               (unsigned long) size);
+      abort ();
+    }
+  return ret;
 }
 
-MPFR_HOT_FUNCTION_ATTR void *
-mpfr_reallocate_func (void * ptr, size_t old_size, size_t new_size)
+void *
+mpfr_default_reallocate (void *oldptr, size_t old_size, size_t new_size)
 {
-  void * (*allocate_func) (size_t);
-  void * (*reallocate_func) (void *, size_t, size_t);
-  void   (*free_func) (void *, size_t);
-  /* Always calling with the 3 arguments smooths branch prediction. */
-  mp_get_memory_functions (&allocate_func, &reallocate_func, &free_func);
-  return (*reallocate_func) (ptr, old_size, new_size);
+  void *ret;
+  ret = realloc (oldptr, new_size);
+  if (ret == NULL)
+    {
+      fprintf (stderr,
+               "MPFR: Can't reallocate memory (old_size=%lu new_size=%lu)\n",
+               (unsigned long) old_size, (unsigned long) new_size);
+      abort ();
+    }
+  return ret;
 }
 
-MPFR_HOT_FUNCTION_ATTR void
-mpfr_free_func (void *ptr, size_t size)
+void
+mpfr_default_free (void *blk_ptr, size_t blk_size)
 {
-  void * (*allocate_func) (size_t);
-  void * (*reallocate_func) (void *, size_t, size_t);
-  void   (*free_func) (void *, size_t);
-  /* Always calling with the 3 arguments smooths branch prediction. */
-  mp_get_memory_functions (&allocate_func, &reallocate_func, &free_func);
-  (*free_func) (ptr, size);
+  free (blk_ptr);
 }
 
 void *
@@ -343,8 +361,8 @@ mpfr_tmp_allocate (struct tmp_marker **tmp_marker, size_t size)
   struct tmp_marker *head;
 
   head = (struct tmp_marker *)
-    mpfr_allocate_func (sizeof (struct tmp_marker));
-  head->ptr = mpfr_allocate_func (size);
+    mpfr_default_allocate (sizeof (struct tmp_marker));
+  head->ptr = mpfr_default_allocate (size);
   head->size = size;
   head->next = *tmp_marker;
   *tmp_marker = head;
@@ -359,9 +377,9 @@ mpfr_tmp_free (struct tmp_marker *tmp_marker)
   while (tmp_marker != NULL)
     {
       t = tmp_marker;
-      mpfr_free_func (t->ptr, t->size);
+      mpfr_default_free (t->ptr, t->size);
       tmp_marker = t->next;
-      mpfr_free_func (t, sizeof (struct tmp_marker));
+      mpfr_default_free (t, sizeof (struct tmp_marker));
     }
 }
 
